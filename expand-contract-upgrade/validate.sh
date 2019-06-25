@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2018 Google LLC
+# Copyright 2019 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -103,10 +103,11 @@ strip_gke_ver() {
 validate_control() {
   CONTROL_VER=$(kubectl -n default version -o json | jq -r .serverVersion.gitVersion)
   VER=$(strip_gke_ver "${CONTROL_VER}")
-  if compare_semver "$VER" "$NEW_K8S_VER"; then
+  NEW_VER=$(strip_gke_ver "${NEW_K8S_VER}")
+  if compare_semver "$VER" "$NEW_VER"; then
     return 0
   else
-    echo "Control plane should be ${NEW_K8S_VER} but is ${VER}"
+    echo "Control plane should be ${NEW_VER} but is ${VER}"
     return 1
   fi
 }
@@ -123,9 +124,10 @@ validate_nodes() {
       jq -r '.status.nodeInfo.kubeletVersion')
     # Strip out the gke patch number to compare with NEW_K8S_VER
     VER=$(strip_gke_ver "${NODE_VER}")
-    if ! compare_semver "$VER" "$NEW_K8S_VER"; then
+    NEW_VER=$(strip_gke_ver "${NEW_K8S_VER}")
+    if ! compare_semver "$VER" "$NEW_VER"; then
       echo -n "ERROR: ${NODE} has version ${VER}, "
-      echo "but should have ${NEW_K8S_VER}"
+      echo "but should have ${NEW_VER}"
       return 1
     fi
   done

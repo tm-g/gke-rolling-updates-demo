@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2018 Google LLC
+# Copyright 2019 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -299,10 +299,10 @@ delete_cluster() {
     --region "${GCLOUD_REGION}"; then
   # Cluster might be still upgrading. Wait up to 5 mins and then delete it
   COUNTER=0
-  until [ $(gcloud container clusters list --filter="STATUS:RUNNING AND NAME:$CLUSTER_NAME" | wc -l) -ne 0 -o $COUNTER -ge 5 ]; do
+  until [[ $(gcloud container clusters list --filter="STATUS:RUNNING AND NAME:$CLUSTER_NAME" | wc -l) -ne 0 || $COUNTER -ge 5 ]]; do
     echo Waiting for cluster upgrade to finish...
     sleep 60
-    COUNTER=$[$COUNTER+1]
+    COUNTER=$((COUNTER+1))
   done
   gcloud container clusters delete $"${CLUSTER_NAME}" \
     --project "${GCLOUD_PROJECT}" \
