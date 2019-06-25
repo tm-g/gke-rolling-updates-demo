@@ -1,5 +1,5 @@
 /*
-Copyright 2018 Google LLC
+Copyright 2019 Google LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -39,6 +39,9 @@ resource "google_container_cluster" "test" {
   // We specify the machine type for the node pool instances.
   node_config {
     machine_type = "${var.machine_type}"
+    metadata {
+      disable-legacy-endpoints = "true"
+    }
   }
 
   // Some operations have been observed to take longer thant the defaults
